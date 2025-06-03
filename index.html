@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>오늘의 옷차림 추천 AI</title>
+  <link type="text/css" rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>오늘의 옷차림을 AI가 추천해드립니다</h1>
+  <div>
+    <img src="./images/main.webp" alt="오늘의 스타일 추천">
+  </div>
+
+  <form id="fashion-form">
+    <label for="gender">성별</label>
+    <select id="gender" name="gender" required>
+      <option value="">선택</option>
+      <option value="남성">남성</option>
+      <option value="여성">여성</option>
+    </select>
+
+    <label for="age">나이</label>
+    <input type="number" id="age" name="age" required />
+
+    <label for="situation">상황 (예: 출근, 데이트, 등교 등)</label>
+    <input type="text" id="situation" name="situation" required />
+
+    <label for="weather">날씨 (예: 맑음, 흐림, 비)</label>
+    <input type="text" id="weather" name="weather" required />
+
+    <label for="temperature">기온 (°C)</label>
+    <input type="number" id="temperature" name="temperature" required />
+
+    <button type="submit">추천 받기</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    const form = document.getElementById("fashion-form");
+    const resultDiv = document.getElementById("result");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const gender = document.getElementById("gender").value;
+      const age = document.getElementById("age").value;
+      const situation = document.getElementById("situation").value;
+      const weather = document.getElementById("weather").value;
+      const temperature = parseFloat(document.getElementById("temperature").value);
+
+      resultDiv.textContent = "추천을 불러오는 중입니다...";
+
+      try {
+        const response = await fetch("https://assign2-eta.vercel.app/api/duksungAI", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ gender, age, situation, weather, temperature }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          resultDiv.textContent = data.answer;
+        } else {
+          resultDiv.textContent = `오류: ${data.error}`;
+        }
+      } catch (err) {
+        resultDiv.textContent = "서버와 통신 중 오류가 발생했습니다.";
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>
